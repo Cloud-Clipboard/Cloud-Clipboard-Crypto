@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json.schemastore.org/eslintrc.json",
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": false
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": ["unused-imports", "import", "prettier", "@typescript-eslint"],
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-console": "warn",
+    "prettier/prettier": "warn",
+    "no-unused-vars": "off",
+    "unused-imports/no-unused-vars": "off",
+    "unused-imports/no-unused-imports": "warn",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "import/order": [
+      "warn",
+      {
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index"
+        ],
+        "newlines-between": "always"
+      }
+    ],
+    "padding-line-between-statements": [
+      "warn",
+      {"blankLine": "always", "prev": "*", "next": "return"},
+      {"blankLine": "always", "prev": ["const", "let", "var"], "next": "*"},
+      {
+        "blankLine": "any",
+        "prev": ["const", "let", "var"],
+        "next": ["const", "let", "var"]
+      }
+    ]
+  }
+}

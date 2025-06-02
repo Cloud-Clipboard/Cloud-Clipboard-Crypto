@@ -1,0 +1,34 @@
+{
+  "name": "cloud-clipboard-crypto-library",
+  "version": "0.0.0",
+  "description": "The core crypto library for the Cloud Clipboard frontend.",
+  "license": "MIT",
+  "author": "Moritz Weirauch, Lukas Meili",
+  "type": "module",
+  "main": "./src/main.ts",
+  "module": "./src/main.ts",
+  "scripts": {
+    "lint": "eslint -c .eslintrc.json ./src/**/**/*.{js,ts} --fix",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@types/argon2-browser": "^1.18.4",
+    "@typescript-eslint/eslint-plugin": "8.11.0",
+    "@typescript-eslint/parser": "8.11.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "5.2.1",
+    "eslint-plugin-unused-imports": "4.1.4",
+    "jsdom": "^26.1.0",
+    "prettier": "3.3.3",
+    "vite": "^5.2.0",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^3.1.1"
+  },
+  "dependencies": {
+    "@noble/ed25519": "^2.2.3",
+    "argon2-browser": "^1.18.0",
+    "base64-js": "^1.5.1"
+  }
+}
