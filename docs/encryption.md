@@ -39,7 +39,7 @@ sequenceDiagram
 
     Client ->> Client: Generate content-encryption key (CEK)
     Client ->> Client: Encrypt content with content-encryption key (CEK)
-    Client ->> Client: Derive metadata-encryption key (MEK) from clipboard key
+    Client ->> Client: Derive metadata-encryption key (MEK) from keyphrase
     Client ->> Client: Encrypt metadata with metadata-encryption key (MEK)
     Client ->> Server: POST /files <br/> {token: JWT, <br/>metadata: encryptedMetadata, <br/>file: encryptedContent}
     Server ->> Server: Verify JWT
@@ -95,7 +95,7 @@ sequenceDiagram
         Server ->> Server: Decrypt metadata with server-side metadata-specific key
         Server ->> Server: Decrypt content with server-side content-specific key
         Server -->> Client: 200 OK <br/> {file: encryptedContent}
-        Client ->> Client: Derive metadata-encryption key (MEK) from clipboard key
+        Client ->> Client: Derive metadata-encryption key (MEK) from keyphrase
         Client ->> Client: Decrypt metadata with metadata-encryption key (MEK)
         Client ->> Client: Decrypt file with content-encryption key (CEK) from metadata
     else JWT is invalid

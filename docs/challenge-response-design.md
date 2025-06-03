@@ -1,6 +1,6 @@
 # Challenge-Response Design Proposal
 
-This document describes a potential design of the challenge which needs to be signed by the client to prove that it has access to the private key/clipboard key.
+This document describes a potential design of the challenge which needs to be signed by the client to prove that it has access to the private key/keyphrase.
 
 ## Issues with Current Design
 
