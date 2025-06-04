@@ -6,11 +6,11 @@ When a file is uploaded, the metadata is encrypted with the MEK and stored in th
 
 When a file is downloaded, the metadata is decrypted with the MEK and the file content is then decrypted with the CEK from the decrypted metadata.
 
-## Key Wretching
+## Key Ratcheting
 
-To make sure that not every metadata is encrypted with the bare keyphrase, a derived wretched key is used (MEK). This ensures, that if the MEK for any given metadata is compromised, only the following metadata is compromised and not the previous ones.
+To make sure that not every metadata is encrypted with the bare keyphrase, a derived ratcheted key is used (MEK). This ensures, that if the MEK for any given metadata is compromised, only the following metadata is compromised and not the previous ones.
 
-In the key wretching approach the keyphrase is passed through a key derivation function (KDF) for each metadata entry (N) to generate the MEK.
+In the key ratcheting approach the keyphrase is passed through a key derivation function (KDF) for each metadata entry (N) to generate the MEK.
 
 To improve performance, only the first pass through the KDF is done with a high configuration. Any subsequent passes are done with a lower configuration, which is sufficient to derive the key for the next metadata entry.
 

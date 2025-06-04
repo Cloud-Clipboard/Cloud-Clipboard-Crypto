@@ -104,8 +104,8 @@ describe("SymmetricEncryption", () => {
 
     symmetricEncryption = new SymmetricEncryption(crypto, fakeKdf);
 
-    // Clear the wretch cache to ensure that the tests are deterministic
-    SymmetricEncryption.clearWretchCache();
+    // Clear the ratchet cache to ensure that the tests are deterministic
+    SymmetricEncryption.clearRatchetCache();
   });
 
   it("encrypts metadata deterministically", async () => {
@@ -148,7 +148,7 @@ describe("SymmetricEncryption", () => {
     expect(decrypted).toEqual(PLAINTEXT_METADATA);
   });
 
-  it("ensure wretched key is cached correctly", async () => {
+  it("ensure ratcheted key is cached correctly", async () => {
     await symmetricEncryption.decryptMetadata(
       KEYPHRASE,
       SALT,
@@ -196,9 +196,9 @@ describe("SymmetricEncryption", () => {
     expect(key.byteLength).toBe(32);
   });
 
-  it("throws when wretchCount ≤ 0", async () => {
+  it("throws when ratchetCount ≤ 0", async () => {
     await expect(
       symmetricEncryption.encryptMetadata(KEYPHRASE, SALT, 0, PLAINTEXT_METADATA),
-    ).rejects.toThrow(/wretch/i);
+    ).rejects.toThrow(/ratchet/i);
   });
 });

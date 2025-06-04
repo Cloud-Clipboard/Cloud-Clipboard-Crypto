@@ -26,12 +26,12 @@ export class SymmetricEncryption {
 
   /**
    * Encrypts the metadata with the keyphrase and salt.
-   * The keyphrase is wretched the amount of times as the file number
+   * The keyphrase is ratcheted the amount of times as the file number
    * and used as the key for the metadata. The IV is prepended to the encrypted value.
    *
    * @param keyphrase - The keyphrase used for encryption.
    * @param salt - The salt used for the kdf.
-   * @param fileNumber - The number of times to wretch the keyphrase.
+   * @param fileNumber - The number of times to ratchet the keyphrase.
    * @param metadata - The metadata to encrypt.
    * @returns A promise that resolves to the encrypted metadata as an Uint8Array.
    * @throws Error if the file number is smaller than 1.
@@ -42,7 +42,7 @@ export class SymmetricEncryption {
     fileNumber: number,
     metadata: Metadata,
   ): Promise<Uint8Array> {
-    const wretchedKey = await this.wretchKey(keyphrase, salt, fileNumber);
+    const ratchetedKey = await this.ratchetKey(keyphrase, salt, fileNumber);
 
     // Check if the metadata is a valid object
     if (metadata && typeof metadata !== "object") {
@@ -53,9 +53,9 @@ export class SymmetricEncryption {
     const metadataString = JSON.stringify(metadata);
     // Get the metadata as a buffer
     const metadataBuffer = new TextEncoder().encode(metadataString);
-    // We encrypt the metadata with the wretched key
+    // We encrypt the metadata with the ratcheted key
     // @ts-ignore Somehow the Uint8Array is not considered a BufferSource in typescript
-    const encryptedMetadata = await this.encrypt(wretchedKey, metadataBuffer);
+    const encryptedMetadata = await this.encrypt(ratchetedKey, metadataBuffer);
 
     // We return the encrypted metadata
     return encryptedMetadata;
@@ -63,12 +63,12 @@ export class SymmetricEncryption {
 
   /**
    * Decrypts the metadata with the keyphrase and salt according to the encryption method.
-   * The keyphrase is wretched the amount of times as the file number
+   * The keyphrase is ratcheted the amount of times as the file number
    * and used as the key for the metadata. The IV has to be prepended to the encrypted value.
    *
    * @param keyphrase - The keyphrase used for decryption.
    * @param salt - The salt used for the kdf.
-   * @param fileNumber - The number of times to wretch the keyphrase.
+   * @param fileNumber - The number of times to ratchet the keyphrase.
    * @param encryptedMetadata - The encrypted metadata to decrypt.
    * @returns A promise that resolves to the decrypted metadata as an object.
    * @throws Error if the file number is smaller than 1 or if the metadata is not an object.
@@ -80,11 +80,11 @@ export class SymmetricEncryption {
     fileNumber: number,
     encryptedMetadata: Uint8Array,
   ): Promise<Metadata> {
-    const wretchedKey = await this.wretchKey(keyphrase, salt, fileNumber);
+    const ratchetedKey = await this.ratchetKey(keyphrase, salt, fileNumber);
 
-    // We decrypt the metadata with the wretched key
+    // We decrypt the metadata with the ratcheted key
     // @ts-ignore Somehow the Uint8Array is not a BufferSource
-    const decryptedMetadata = await this.decrypt(wretchedKey, encryptedMetadata);
+    const decryptedMetadata = await this.decrypt(ratchetedKey, encryptedMetadata);
     // We parse the metadata
     const metadataString = new TextDecoder().decode(decryptedMetadata);
     const metadata = JSON.parse(metadataString);
@@ -236,80 +236,80 @@ export class SymmetricEncryption {
   }
 
   /**
-   * Cache for wretched keys to avoid recalculating them multiple times.
-   * The cache is initialized with the key and salt used for wretching.
+   * Cache for ratcheted keys to avoid recalculating them multiple times.
+   * The cache is initialized with the key and salt used for ratcheting.
    * This cache is static to ensure that it is shared across all instances of the SymmetricEncryption class.
    * It should be cleared when the user logs out or when the keyphrase changes.
    */
-  private static wretchCache?: {
+  private static ratchetCache?: {
     key: string;
     salt: string;
     hashes: Map<number, Uint8Array>;
   };
 
   /**
-   * Wretches the key the amount of times as defined in the wretchCount.
+   * Ratchetes the key the amount of times as defined in the ratchetCount.
    *
-   * @param key - The key to wretch.
-   * @param salt - The salt to use for the wretching/kdf.
-   * @param wretchCount - The amount of times to wretch the key. Has to be larger than 0.
-   * @returns A promise that resolves to the wretched key as an Uint8Array.
-   * @throws Error if the wretchCount is smaller than 1.
+   * @param key - The key to ratchet.
+   * @param salt - The salt to use for the ratcheting/kdf.
+   * @param ratchetCount - The amount of times to ratchet the key. Has to be larger than 0.
+   * @returns A promise that resolves to the ratcheted key as an Uint8Array.
+   * @throws Error if the ratchetCount is smaller than 1.
    */
-  private async wretchKey(key: string, salt: string, wretchCount: number): Promise<Uint8Array> {
-    // We need to ensure that wretchCount is larger than 0
-    if (wretchCount <= 0) {
-      throw new Error("Wretch count must be larger than 0");
+  private async ratchetKey(key: string, salt: string, ratchetCount: number): Promise<Uint8Array> {
+    // We need to ensure that ratchetCount is larger than 0
+    if (ratchetCount <= 0) {
+      throw new Error("Ratchet count must be larger than 0");
     }
 
-    // We check if the cache is initialized for the wretching
-    this.initalizeWretchCache(key, salt);
+    // We check if the cache is initialized for the ratcheting
+    this.initalizeRatchetCache(key, salt);
 
-    // We check if the wretched key is already cached
-    if (SymmetricEncryption.wretchCache?.hashes.get(wretchCount)) {
-      return SymmetricEncryption.wretchCache!.hashes.get(wretchCount)!;
+    // We check if the ratcheted key is already cached
+    if (SymmetricEncryption.ratchetCache?.hashes.get(ratchetCount)) {
+      return SymmetricEncryption.ratchetCache!.hashes.get(ratchetCount)!;
     }
 
-    // We wretch the key the amount of times as the wretch count
+    // We ratchet the key the amount of times as the ratchet count
     // and use that as the key for the metadata.
-    // For the first wretch we use the regular/strong kdf to hash the key and salt.
+    // For the first ratchet we use the regular/strong kdf to hash the key and salt.
     // We precalculate the salt hash to avoid hashing it multiple times.
     const saltHash = await this.kdf.hashSalt(salt);
-    // We use the cached wretched key if it exists, otherwise we hash the key with the kdf
-    let wretchedKey =
-      SymmetricEncryption.wretchCache?.hashes.get(1) ??
+    // We use the cached ratcheted key if it exists, otherwise we hash the key with the kdf
+    let ratchetedKey =
+      SymmetricEncryption.ratchetCache?.hashes.get(1) ??
       (await this.kdf.hash(key, undefined, saltHash));
 
-    // We cache the wretched key
-    SymmetricEncryption.wretchCache!.hashes.set(1, wretchedKey);
+    // We cache the ratcheted key
+    SymmetricEncryption.ratchetCache!.hashes.set(1, ratchetedKey);
 
-    for (let i = 2; i <= wretchCount; i++) {
-      // We wretch the key by hashing it with the kdf again
-      // If we have already cached the wretched key, we use that instead
-      wretchedKey =
-        SymmetricEncryption.wretchCache?.hashes.get(i) ??
-        (await this.kdf.fastHash(wretchedKey, undefined, saltHash));
+    for (let i = 2; i <= ratchetCount; i++) {
+      // We ratchet the key by hashing it with the kdf again
+      // If we have already cached the ratcheted key, we use that instead
+      ratchetedKey =
+        SymmetricEncryption.ratchetCache?.hashes.get(i) ??
+        (await this.kdf.fastHash(ratchetedKey, undefined, saltHash));
 
-      // We cache the wretched key again
-      SymmetricEncryption.wretchCache!.hashes.set(i, wretchedKey);
+      // We cache the ratcheted key again
+      SymmetricEncryption.ratchetCache!.hashes.set(i, ratchetedKey);
     }
 
-    return wretchedKey;
+    return ratchetedKey;
   }
 
   /**
-   * Initializes the wretch cache with the provided key and salt.
+   * Initializes the ratchet cache with the provided key and salt.
    * If the cache is already initialized with the same key and salt,
    * this method does nothing.
    * @param key The key to initialize the cache with.
    * @param salt The salt to initialize the cache with.
    */
-  private initalizeWretchCache(key: string, salt: string): void {
+  private initalizeRatchetCache(key: string, salt: string): void {
     if (
-      SymmetricEncryption.wretchCache?.key !== key ||
-      SymmetricEncryption.wretchCache?.salt !== salt
+      SymmetricEncryption.ratchetCache?.key !== key ||
+      SymmetricEncryption.ratchetCache?.salt !== salt
     ) {
-      SymmetricEncryption.wretchCache = {
+      SymmetricEncryption.ratchetCache = {
         key,
         salt,
         hashes: new Map<number, Uint8Array>(),
@@ -318,10 +318,10 @@ export class SymmetricEncryption {
   }
 
   /**
-   * Clears any cached wretched keys.
+   * Clears any cached ratcheted keys.
    * This should be used when a user logs out or when the keyphrase changes.
    */
-  static clearWretchCache(): void {
-    SymmetricEncryption.wretchCache = undefined;
+  static clearRatchetCache(): void {
+    SymmetricEncryption.ratchetCache = undefined;
   }
 }
