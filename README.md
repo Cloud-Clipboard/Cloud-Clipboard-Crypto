@@ -2,7 +2,7 @@
 
 This repository contains protocol documentation and source code for the client crypto component of the Cloud Clipboard frontend application.
 
-By making this information open source, we aim to provide transparency and allow the community to contribute to the development of secure clipboard management solutions.
+By making this information open source, we aim to provide transparency and allow the community to contribute to the development of a secure clipboard management solution.
 
 ## Terminology
 
